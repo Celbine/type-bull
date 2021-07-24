@@ -32,14 +32,18 @@ export class BullModule {
       token = `${v4()}:BULL_PROVIDERS`;
     }
 
-    const providers = createBullProviders(entities);
+    const instancesEntities = entities.map((e) => new e());
 
-    QueueEntitiesMetadataStorage.addEntitiesByToken(token, [...entities]);
+    const providers = createBullProviders(instancesEntities);
+
+    QueueEntitiesMetadataStorage.addEntitiesByToken(token, [
+      ...instancesEntities,
+    ]);
 
     return {
       module: BullModule,
-      providers: [...providers],
-      exports: [...providers],
+      providers: providers,
+      exports: providers,
     };
   }
 

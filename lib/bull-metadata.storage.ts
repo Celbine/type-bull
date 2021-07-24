@@ -1,9 +1,11 @@
 import {
   IBullModuleAsyncOptions,
   IBullOptions,
+  QueueEntity,
   QueueEntityOrFunction,
 } from './interfaces';
 import { Queue } from 'bull';
+import { createHandleQueue } from './common';
 
 type QueueToken = IBullOptions | IBullModuleAsyncOptions | string;
 
@@ -22,8 +24,8 @@ export class QueueEntitiesMetadataStorage {
       this.storage.set(queueToken, collection);
     }
 
-    entities.forEach((entity: Queue) => {
-      if(!collection) {
+    entities.forEach((entity: QueueEntity) => {
+      if (!collection) {
         return;
       }
 
@@ -31,7 +33,7 @@ export class QueueEntitiesMetadataStorage {
         return;
       }
 
-      collection.push(entity);
+      collection.push(createHandleQueue(entity));
     });
   }
 

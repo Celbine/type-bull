@@ -1,6 +1,6 @@
 {
   "name": "type-bull",
-  "version": "1.0.6",
+  "version": "1.0.10",
   "description": "Nest - modern, fast, powerful node.js web framework (type-bull)",
   "author": "Denis Vakhtenkov",
   "license": "MIT",
@@ -47,6 +47,7 @@
     "url": "https://github.com/Celbine/type-bull.git"
   },
   "peerDependencies": {
+    "bull": "^3.26.0",
     "@nestjs/common": "^8.0.0",
     "@nestjs/core": "^8.0.0",
     "reflect-metadata": "^0.1.13"

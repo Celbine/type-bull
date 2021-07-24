@@ -48,4 +48,9 @@ export interface IBullModuleAsyncOptions
   inject?: any[];
 }
 
+export class QueueEntity<T = any> extends Bull<T> {
+  processCallback: ProcessType;
+  events: Map<string, (...args: any[]) => void>;
+}
+
 export type QueueEntityOrFunction<T = any> = Queue<T> | any;

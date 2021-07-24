@@ -1,59 +1,49 @@
 import {
   BullEvents,
   IChildProcessOpts,
+  QueueEntity,
   QueueEntityOrFunction,
 } from '../interfaces';
-import { QueueOptions, Queue as BullQueue } from 'bull';
+import { QueueOptions } from 'bull';
 import { Inject } from '@nestjs/common';
 import { CircularDependencyException } from '@nestjs/core/errors/exceptions/circular-dependency.exception';
 
-export const Queue = (
-  queueName: string,
-  opts: QueueOptions,
-) => {
+export const Queue = (queueName: string, opts: QueueOptions): Function => {
   return function (constructor) {
     return class extends constructor {
       constructor() {
         super(queueName, opts);
       }
-    } as typeof constructor;
+    };
   };
 };
 
-export const Process = (processOpts?: IChildProcessOpts) => {
+export const Process = (processOpts?: IChildProcessOpts): Function => {
   return function (
-    target: BullQueue,
+    target: QueueEntity,
     key: string,
     descriptor: PropertyDescriptor,
   ) {
     if (processOpts) {
-      if (processOpts.name && processOpts.concurrency) {
-        target.process(
-          processOpts.name,
-          processOpts.concurrency,
-          processOpts.filePath,
-        );
-      }
-
-      if (!processOpts.name && processOpts.concurrency) {
-        target.process(processOpts.concurrency, processOpts.filePath);
-      }
-
-      if (!processOpts.name && !processOpts.concurrency) {
-        target.process(processOpts.filePath);
-      }
+      target.processCallback = processOpts;
+      return;
     }
-    target.process(descriptor.value);
+
+    target.processCallback = descriptor.value;
   };
 };
 
-export const Event = (event: BullEvents) => {
+export const Event = (event: BullEvents): Function => {
   return function (
-    target: BullQueue,
+    target: QueueEntity,
     key: string,
     descriptor: PropertyDescriptor,
   ) {
-    target.on(event, descriptor.value);
+    if (!target.events) {
+      target.events = new Map();
+    }
+
+    target.events.set(event, descriptor.value);
   };
 };
 
