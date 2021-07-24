@@ -1,6 +1,6 @@
 {
   "name": "type-bull",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "description": "Nest - modern, fast, powerful node.js web framework (type-bull)",
   "author": "Denis Vakhtenkov",
   "license": "MIT",
@@ -54,6 +54,7 @@
   },
   "keywords": [
     "bull",
+    "decorators",
     "nestjs",
     "decorators",
     "type-bull",

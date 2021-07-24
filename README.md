@@ -3,14 +3,19 @@
 </p>
 
 [travis-image]: https://api.travis-ci.org/nestjs/nest.svg?branch=master
+
 [travis-url]: https://travis-ci.org/nestjs/nest
+
 [linux-image]: https://img.shields.io/travis/nestjs/nest/master.svg?label=linux
+
 [linux-url]: https://travis-ci.org/nestjs/nest
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
+  <p align="center">A small <a href="https://github.com/OptimalBits/bull" target="blank">bull</a> module for <a href="https://github.com/nestjs/nest" target="blank">nestjs</a> that additionally adds decorators</p>
+<a href="https://www.npmjs.com/~celbine"><img src="https://img.shields.io/npm/v/type-bull" alt="NPM Version" /></a>
+<a href="https://www.npmjs.com/~celbine"><img src="https://img.shields.io/npm/l/type-bull" alt="Package License" /></a>
+<a href="https://www.npmjs.com/~celbine"><img src="https://img.shields.io/npm/dt/type-bull" alt="Total downloads" /></a>
+<a href="https://www.npmjs.com/~celbine"><img src="https://img.shields.io/github/languages/code-size/celbine/type-bull" alt="Code size" /></a>
+<a href="https://www.npmjs.com/~celbine"><img src="https://img.shields.io/github/issues-raw/celbine/type-bull" alt="Open issues" /></a>
 
 ## Description
 
@@ -35,6 +40,7 @@ $ npm i --save type-bull
 [Overview & Tutorial](https://blog.taskforce.sh/)
 
 ## Quick Guide
+
 ### Basic Usage
 
 ```
@@ -54,24 +60,26 @@ project
 │           │   test.queue.ts
 ```
 
-
 ```js
 // app.module.ts
 
 @Module({
-    imports: [TestModule],
-    providers: [AppService]
+    imports: [TestModule]
 })
-export class AppModule {}
+export class AppModule {
+}
 ```
+
 ```js
 // test.module.ts
 
 @Module({
-  imports: [BullModule.forRoot(), TestQueueModule],
+    imports: [BullModule.forRoot(), TestQueueModule],
 })
-export class TestModule {}
+export class TestModule {
+}
 ```
+
 ```js
 // test.queue.module.ts
 
@@ -79,8 +87,10 @@ export class TestModule {}
     imports: [BullModule.forFeature([TestQueue])],
     providers: [TestQueueService]
 })
-export class TestQueueModule {}
+export class TestQueueModule {
+}
 ```
+
 ```js
 // test.queue.service.ts
 
@@ -88,14 +98,20 @@ export class TestQueueModule {}
 export class TestQueueService {
     constructor(
         @InjectQueue(TestQueue)
-        private readonly testQueue: TestQueue
-    ) {}
+            private
 
-    addInQueue(someData) {
-        return this.testQueue.add(someData);
-    }
+    readonly
+    testQueue: TestQueue
+) {
+}
+
+addInQueue(someData)
+{
+    return this.testQueue.add(someData);
+}
 }
 ```
+
 ```js
 // test.queue.ts
 
@@ -106,30 +122,30 @@ export class TestQueueService {
     },
 })
 export class TestQueue extends Bull {
-    public readonly logger = new Logger();
+    public readonly
+    logger = new Logger();
 
-    @Process()
-    testProcess(job, done) {
+    // this way
+    @Process() testProcess(job, done) {
         this.logger.debug(job)
         this.logger.debug(done)
     }
 
+    // or this way
     @Process({
         name: 'someName',
         filePath: '../somepath.js',
         concurrency: 5
-    })
-    testChildProcess() {}
+    }) testChildProcess() {
+    }
 
 
-    @Event('global:progress')
-    testEventGlobal(job, progress) {
+    @Event('global:progress') testEventGlobal(job, progress) {
         this.logger.debug(job)
         this.logger.debug(progress)
     }
 
-    @Event('progress')
-    testEventProgress(job, progress) {
+    @Event('progress') testEventProgress(job, progress) {
         this.logger.debug(job)
         this.logger.debug(progress)
     }
