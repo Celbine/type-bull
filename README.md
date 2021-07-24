@@ -105,7 +105,7 @@ export class TestQueueService {
         host: '127.0.0.1',
     },
 })
-export class TestQueue extends QueueEntity {
+export class TestQueue extends Bull {
     public readonly logger = new Logger();
 
     @Process()
