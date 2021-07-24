@@ -1,6 +1,6 @@
 {
   "name": "type-bull",
-  "version": "1.0.0",
+  "version": "1.0.6",
   "description": "Nest - modern, fast, powerful node.js web framework (type-bull)",
   "author": "Denis Vakhtenkov",
   "license": "MIT",
@@ -10,7 +10,7 @@
   "readmeFilename": "README.md",
   "homepage": "https://github.com/Celbine/type-bull#readme",
   "scripts": {
-    "build": "rimraf dist && tsc -p tsconfig.build.json",
+    "build": "rimraf dist && tsc -p tsconfig.json",
     "format": "prettier --write \"**/*.ts\"",
     "lint": "eslint lib/**/*.ts --fix",
     "release": "release-it",

@@ -16,7 +16,7 @@ export const Queue = (
       constructor() {
         super(queueName, opts);
       }
-    };
+    } as typeof constructor;
   };
 };
 
