@@ -1,56 +1,26 @@
-import { DynamicModule, Logger, Module } from '@nestjs/common';
-import { QueueEntitiesMetadataStorage } from './bull-metadata.storage';
-import { BullCoreModule } from './bull-core.module';
-import {
-  IBullModuleAsyncOptions,
-  IBullOptions,
-  QueueEntityOrFunction,
-} from './interfaces';
+import { DynamicModule, Module } from '@nestjs/common';
+import {QueueEntity} from './interfaces';
 import { createBullProviders } from './bull.providers';
-import { v4 } from 'uuid';
+import * as Bull from "bull";
+import {createHandleQueue} from "./common";
 
 @Module({})
 export class BullModule {
-  private static readonly logger = new Logger('BullModule');
-
-  static forRoot(options?: IBullOptions): DynamicModule {
-    return {
-      module: BullModule,
-      imports: [BullCoreModule.forRoot(options)],
-    };
-  }
-
   static forFeature(
-    entities: QueueEntityOrFunction[] = [],
-    token?: string,
+    entities: QueueEntity[] = [],
   ): DynamicModule {
     if (!entities || entities.length === 0) {
       return;
     }
 
-    if (!token) {
-      token = `${v4()}:BULL_PROVIDERS`;
-    }
-
-    const instancesEntities = entities.map((e) => new e());
+    const instancesEntities = entities.map((e) => createHandleQueue(new Bull(e.queueName, e.opts), e));
 
     const providers = createBullProviders(instancesEntities);
-
-    QueueEntitiesMetadataStorage.addEntitiesByToken(token, [
-      ...instancesEntities,
-    ]);
 
     return {
       module: BullModule,
       providers: providers,
       exports: providers,
-    };
-  }
-
-  static forRootAsync(options: IBullModuleAsyncOptions): DynamicModule {
-    return {
-      module: BullModule,
-      imports: [BullCoreModule.forRootAsync(options)],
     };
   }
 }

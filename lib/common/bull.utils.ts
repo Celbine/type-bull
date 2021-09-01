@@ -1,39 +1,45 @@
 import { IChildProcessOpts, QueueEntity } from '../interfaces';
 import { Queue } from 'bull';
+import * as Bull from "bull";
 
-export const createHandleQueue = (queueEntity: QueueEntity): Queue => {
-  const process = queueEntity.processCallback;
+export const createHandleQueue = (instance: Bull.Queue, queueEntity: QueueEntity): Queue => {
+  const processMap = queueEntity.processCallbackMap;
+  const childProcess = queueEntity.childProcessCallback as IChildProcessOpts;
   const events = queueEntity.events;
 
-  if (process) {
-    if (typeof queueEntity.processCallback === 'function') {
-      queueEntity.process(queueEntity.processCallback);
-    } else {
-      const processChild = process as IChildProcessOpts;
-
-      if (processChild.name && processChild.concurrency) {
-        queueEntity.process(
-          processChild.name,
-          processChild.concurrency,
-          processChild.filePath,
-        );
-      }
-
-      if (!processChild.name && processChild.concurrency) {
-        queueEntity.process(processChild.concurrency, processChild.filePath);
-      }
-
-      if (!processChild.name && !processChild.concurrency) {
-        queueEntity.process(processChild.filePath);
-      }
+  if(childProcess) {
+    if (childProcess.name && childProcess.concurrency) {
+      instance.process(
+          childProcess.name,
+          childProcess.concurrency,
+          childProcess.filePath,
+      );
     }
+
+    if (!childProcess.name && childProcess.concurrency) {
+      instance.process(childProcess.concurrency, childProcess.filePath);
+    }
+
+    if (!childProcess.name && !childProcess.concurrency) {
+      instance.process(childProcess.filePath);
+    }
+  }
+
+  if (processMap.size > 0) {
+    instance.process('*', (job) => {
+      const jobName = (job.data && job.data.jobName) || job.name;
+
+      const handler = processMap.get(jobName) || processMap.get('*');
+
+      handler(job);
+    })
   }
 
   if (events) {
     events.forEach((value, key) => {
-      queueEntity.on(key, value);
+      instance.on(key, value);
     });
   }
 
-  return queueEntity;
+  return instance;
 };

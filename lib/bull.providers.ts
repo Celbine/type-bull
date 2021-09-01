@@ -1,11 +1,11 @@
 import { Provider } from '@nestjs/common';
-import { QueueEntityOrFunction } from './interfaces';
+import * as Bull from "bull";
 
 export function createBullProviders(
-  entities?: QueueEntityOrFunction[],
+    queues?: Bull.Queue[],
 ): Provider[] {
-  return (entities || []).map((entity: QueueEntityOrFunction) => ({
-    provide: entity.name,
-    useFactory: () => entity,
+  return (queues || []).map((queue) => ({
+    provide: queue.name,
+    useFactory: () => queue,
   }));
 }

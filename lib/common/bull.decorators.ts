@@ -2,7 +2,6 @@ import {
   BullEvents,
   IChildProcessOpts,
   QueueEntity,
-  QueueEntityOrFunction,
 } from '../interfaces';
 import { QueueOptions } from 'bull';
 import { Inject } from '@nestjs/common';
@@ -10,26 +9,28 @@ import { CircularDependencyException } from '@nestjs/core/errors/exceptions/circ
 
 export const Queue = (queueName: string, opts: QueueOptions): Function => {
   return function (constructor) {
-    return class extends constructor {
-      constructor() {
-        super(queueName, opts);
-      }
-    };
+    const newClass = class extends constructor {};
+    newClass.queueName = queueName;
+    newClass.opts = opts;
+    return newClass;
   };
 };
 
-export const Process = (processOpts?: IChildProcessOpts): Function => {
+export const Process = (processOpts: IChildProcessOpts | string): Function => {
   return function (
     target: QueueEntity,
     key: string,
     descriptor: PropertyDescriptor,
   ) {
-    if (processOpts) {
-      target.processCallback = processOpts;
+    if (processOpts && typeof processOpts !== 'string' ) {
+      target.childProcessCallback = processOpts;
       return;
     }
 
-    target.processCallback = descriptor.value;
+    if(typeof processOpts === 'string'){
+      target.processCallbackMap.set(processOpts, descriptor.value);
+    }
+    throw new Error(`Process('job_name' || IChildProcessOpts) is required argument`);
   };
 };
 
@@ -48,7 +49,7 @@ export const Event = (event: BullEvents): Function => {
 };
 
 export const InjectQueue = (
-  entityOrQueueName: QueueEntityOrFunction | string,
+  entityOrQueueName: QueueEntity | string,
 ) => {
   if (entityOrQueueName === null || entityOrQueueName === undefined) {
     throw new CircularDependencyException('@InjectQueue()');
