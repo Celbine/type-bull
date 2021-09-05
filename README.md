@@ -74,7 +74,7 @@ export class AppModule {
 // test.module.ts
 
 @Module({
-    imports: [BullModule.forRoot(), TestQueueModule],
+    imports: [TestQueueModule],
 })
 export class TestModule {
 }
@@ -85,7 +85,7 @@ export class TestModule {
 
 @Module({
     imports: [BullModule.forFeature([TestQueue])],
-    providers: [TestQueueService]
+    providers: [TestQueueService, TestQueue]
 })
 export class TestQueueModule {
 }
@@ -97,18 +97,13 @@ export class TestQueueModule {
 @Injectable()
 export class TestQueueService {
     constructor(
-        @InjectQueue(TestQueue)
-            private
+        @Inject(TestQueue)
+        private readonly testQueue: TypeBull<TestQueue>
+    ) {}
 
-    readonly
-    testQueue: TestQueue
-) {
-}
-
-addInQueue(someData)
-{
-    return this.testQueue.add(someData);
-}
+    addInQueue(someData) {
+      return this.testQueue.add(someData);
+    }
 }
 ```
 
@@ -122,13 +117,12 @@ addInQueue(someData)
     },
 })
 export class TestQueue extends Bull {
-    public readonly
-    logger = new Logger();
+    public readonly logger = new Logger();
 
     // this way
-    @Process() testProcess(job, done) {
+    @Process('HANDLE_TEST') 
+    testProcess(job) {
         this.logger.debug(job)
-        this.logger.debug(done)
     }
 
     // or this way
@@ -136,16 +130,17 @@ export class TestQueue extends Bull {
         name: 'someName',
         filePath: '../somepath.js',
         concurrency: 5
-    }) testChildProcess() {
-    }
+    }) testChildProcess() {}
 
 
-    @Event('global:progress') testEventGlobal(job, progress) {
+    @Event('global:progress') 
+    testEventGlobal(job, progress) {
         this.logger.debug(job)
         this.logger.debug(progress)
     }
 
-    @Event('progress') testEventProgress(job, progress) {
+    @Event('progress') 
+    testEventProgress(job, progress) {
         this.logger.debug(job)
         this.logger.debug(progress)
     }

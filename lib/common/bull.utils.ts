@@ -1,15 +1,13 @@
 import { IChildProcessOpts, QueueEntity } from '../interfaces';
-import { Queue } from 'bull';
-import * as Bull from "bull";
 
-export const createHandleQueue = (instance: Bull.Queue, queueEntity: QueueEntity): Queue => {
+export const createHandleQueue = (queueEntity: QueueEntity): QueueEntity => {
   const processMap = queueEntity.processCallbackMap;
   const childProcess = queueEntity.childProcessCallback as IChildProcessOpts;
   const events = queueEntity.events;
 
   if(childProcess) {
     if (childProcess.name && childProcess.concurrency) {
-      instance.process(
+      queueEntity.bull.process(
           childProcess.name,
           childProcess.concurrency,
           childProcess.filePath,
@@ -17,16 +15,16 @@ export const createHandleQueue = (instance: Bull.Queue, queueEntity: QueueEntity
     }
 
     if (!childProcess.name && childProcess.concurrency) {
-      instance.process(childProcess.concurrency, childProcess.filePath);
+      queueEntity.bull.process(childProcess.concurrency, childProcess.filePath);
     }
 
     if (!childProcess.name && !childProcess.concurrency) {
-      instance.process(childProcess.filePath);
+      queueEntity.bull.process(childProcess.filePath);
     }
   }
 
-  if (processMap.size > 0) {
-    instance.process('*', (job) => {
+  if (processMap && processMap.size > 0) {
+    queueEntity.bull.process('*', (job) => {
       const jobName = (job.data && job.data.jobName) || job.name;
 
       const handler = processMap.get(jobName) || processMap.get('*');
@@ -37,9 +35,9 @@ export const createHandleQueue = (instance: Bull.Queue, queueEntity: QueueEntity
 
   if (events) {
     events.forEach((value, key) => {
-      instance.on(key, value);
+      queueEntity.bull.on(key, value);
     });
   }
 
-  return instance;
+  return queueEntity;
 };

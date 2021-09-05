@@ -1,5 +1,7 @@
-import {ProcessPromiseFunction, QueueOptions} from 'bull';
+import {ProcessPromiseFunction} from 'bull';
 import * as Bull from "bull";
+
+export type TypeBull<T> = T & {bull: Bull.Queue};
 
 export type BullEvents =
   | 'error'
@@ -23,9 +25,8 @@ export interface IChildProcessOpts {
 }
 
 export class QueueEntity<T = any> {
-  opts?: QueueOptions;
-  queueName: string;
+  bull?: Bull.Queue;
   childProcessCallback: IChildProcessOpts;
-  processCallbackMap: Map<string, ProcessPromiseFunction<T>> = new Map();
+  processCallbackMap: Map<string, ProcessPromiseFunction<T>>;
   events: Map<string, (...args: any[]) => void>;
 }
