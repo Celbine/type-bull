@@ -1,5 +1,5 @@
 import {
-    BullEvents,
+    BullEvents, IBullOpts,
     IChildProcessOpts,
     QueueEntity,
 } from '../interfaces';
@@ -17,19 +17,26 @@ export const Queue = (queueName: string, opts: QueueOptions): Function => {
             constructor(...args) {
                 super(...args);
 
-                if(constructor.processCallbackMap){
+                if (constructor.processCallbackMap) {
                     Array.from(constructor.processCallbackMap).map(([key, value]) => {
-                        constructor.processCallbackMap.set(key, value.bind(this));
+                        constructor.processCallbackMap.set(key, {
+                            descriptor: value.descriptor.bind(this),
+                            opts: value.opts,
+                        });
                     });
                 }
 
-                if(constructor.events){
+                if (constructor.events) {
                     Array.from(constructor.events).map(([key, value]) => {
-                        constructor.events.set(key, value.bind(this));
+                        constructor.events.set(key,
+                            {
+                                descriptor: value.descriptor.bind(this),
+                                opts: value.opts,
+                            });
                     });
                 }
 
-                if(constructor.childProcessCallback){
+                if (constructor.childProcessCallback) {
                     constructor.childProcessCallback = constructor.childProcessCallback.bind(this);
                 }
             }
@@ -37,13 +44,13 @@ export const Queue = (queueName: string, opts: QueueOptions): Function => {
     };
 };
 
-export const Process = (processOpts: IChildProcessOpts | string): Function => {
+export const Process = (processOpts: IChildProcessOpts | string, opts?: IBullOpts): Function => {
     return function (
-        target: {constructor: QueueEntity},
+        target: { constructor: QueueEntity },
         key: string,
         descriptor: PropertyDescriptor,
     ) {
-        if(!target.constructor.processCallbackMap) {
+        if (!target.constructor.processCallbackMap) {
             target.constructor.processCallbackMap = new Map();
         }
 
@@ -53,7 +60,10 @@ export const Process = (processOpts: IChildProcessOpts | string): Function => {
         }
 
         if (typeof processOpts === "string") {
-            target.constructor.processCallbackMap.set(processOpts, descriptor.value);
+            target.constructor.processCallbackMap.set(processOpts, {
+                descriptor: descriptor.value,
+                opts
+            });
             return;
         }
 
@@ -61,16 +71,19 @@ export const Process = (processOpts: IChildProcessOpts | string): Function => {
     };
 };
 
-export const Event = (event: BullEvents): Function => {
+export const Event = (event: BullEvents, opts?: IBullOpts): Function => {
     return function (
-        target: {constructor: QueueEntity},
+        target: { constructor: QueueEntity },
         key: string,
         descriptor: PropertyDescriptor,
     ) {
-        if(!target.constructor.events) {
+        if (!target.constructor.events) {
             target.constructor.events = new Map();
         }
 
-        target.constructor.events.set(event, descriptor.value);
+        target.constructor.events.set(event, {
+            descriptor: descriptor.value,
+            opts
+        });
     };
 };

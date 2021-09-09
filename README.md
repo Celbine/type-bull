@@ -102,7 +102,7 @@ export class TestQueueService {
     ) {}
 
     addInQueue(someData) {
-      return this.testQueue.add(someData);
+      return this.testQueue.constructor.bull.add(someData);
     }
 }
 ```

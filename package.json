@@ -1,6 +1,6 @@
 {
   "name": "type-bull",
-  "version": "2.1.1",
+  "version": "2.2.5",
   "description": "Nest - modern, fast, powerful node.js web framework (type-bull)",
   "author": "Denis Vakhtenkov",
   "license": "MIT",
@@ -23,20 +23,18 @@
   "devDependencies": {
     "@commitlint/cli": "^12.1.4",
     "@commitlint/config-angular": "^12.1.4",
-    "@nestjs/common": "^8.0.4",
     "@types/bull": "^3.15.2",
-    "@nestjs/core": "^8.0.4",
     "@types/node": "^16.4.1",
     "@types/uuid": "^8.3.1",
-    "husky": "^7.0.1",
     "@typescript-eslint/eslint-plugin": "4.28.4",
     "@typescript-eslint/parser": "4.28.4",
+    "bull": "^3.26.0",
     "eslint": "7.31.0",
     "eslint-config-prettier": "8.3.0",
     "eslint-plugin-import": "2.23.4",
+    "husky": "^7.0.1",
     "lint-staged": "^11.1.0",
     "prettier": "^2.3.2",
-    "bull": "^3.26.0",
     "reflect-metadata": "^0.1.13",
     "release-it": "^14.10.0",
     "rimraf": "^3.0.2",
@@ -48,8 +46,8 @@
   },
   "peerDependencies": {
     "bull": "^3.26.0",
-    "@nestjs/common": "^8.0.0",
-    "@nestjs/core": "^8.0.0",
+    "ajv": "^8.6.2",
+    "class-validator": "^0.13.1",
     "reflect-metadata": "^0.1.13"
   },
   "keywords": [
@@ -62,6 +60,8 @@
     "bulljs"
   ],
   "dependencies": {
+    "class-validator": "^0.13.1",
+    "ajv": "^8.6.2",
     "uuid": "^8.3.2"
   },
   "lint-staged": {

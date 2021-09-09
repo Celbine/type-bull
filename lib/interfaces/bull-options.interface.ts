@@ -1,7 +1,11 @@
 import {ProcessPromiseFunction} from 'bull';
 import * as Bull from "bull";
 
-export type TypeBull<T> = T & {bull: Bull.Queue};
+export type TypeBull<T> = T & {constructor: {bull: Bull.Queue}};
+
+export interface IBullOpts {
+  validator: Object | Function;
+}
 
 export type BullEvents =
   | 'error'
@@ -27,6 +31,6 @@ export interface IChildProcessOpts {
 export class QueueEntity<T = any> {
   bull?: Bull.Queue;
   childProcessCallback: IChildProcessOpts;
-  processCallbackMap: Map<string, ProcessPromiseFunction<T>>;
-  events: Map<string, (...args: any[]) => void>;
+  processCallbackMap: Map<string, {descriptor: ProcessPromiseFunction<T>, opts: IBullOpts}>;
+  events: Map<string, {descriptor: (...args: any[]) => void, opts: IBullOpts}>;
 }
